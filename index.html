@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Jalur Langit Tracker — Pelacak Ibadah, Doa & Syukur</title>
+
+  <!-- PWA & Mobile Install Meta Tags -->
+  <meta name="theme-color" content="#0D0A1B" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jalur Langit" />
+  <meta name="application-name" content="Jalur Langit Tracker" />
+  <meta name="description" content="Pelacak ibadah harian, sholat sunnah, catatan doa & hajat, serta jurnal syukur." />
+  <link id="pwa-manifest" rel="manifest" />
+  <link id="apple-touch-icon" rel="apple-touch-icon" />
+  <link id="app-favicon" rel="icon" type="image/png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            twilight: {
+              950: '#0D0A1B',
+              900: '#130F26',
+              850: '#181330',
+              800: '#1F193D',
+              750: '#261F4B',
+              700: '#2E2659',
+              600: '#3B3170',
+            },
+            lavender: {
+              300: '#C4B5FD',
+              400: '#A594FF',
+              500: '#8B75FF',
+              600: '#7358FA',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0D0A1B;
+      color: #F8FAFC;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #130F26;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2E2659;
+      border-radius: 9999px;
+    }
+
+    /* Animations */
+    @keyframes popCheck {
+      0% { transform: scale(0.75); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .animate-check {
+      animation: popCheck 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .view-animate {
+      animation: fadeSlideUp 0.24s ease-out forwards;
+    }
+
+    /* Date picker overlay */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Twilight Glass Surfaces */
+    .card-twilight {
+      background: linear-gradient(155deg, #231D46 0%, #1C1638 100%);
+      border: 1px solid rgba(139, 117, 255, 0.14);
+      box-shadow: 0 8px 24px -6px rgba(8, 5, 22, 0.65);
+    }
+
+    .progress-hero {
+      background: linear-gradient(135deg, #43348A 0%, #31256B 55%, #241B52 100%);
+      border: 1px solid rgba(196, 181, 253, 0.24);
+      box-shadow: 0 12px 28px -8px rgba(115, 88, 250, 0.35);
+    }
+
+    .nav-blur {
+      background: rgba(19, 15, 38, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center selection:bg-lavender-500 selection:text-white">
+
+  <!-- Mobile-First App Shell -->
+  <div class="w-full max-w-[460px] min-h-screen bg-twilight-900 relative flex flex-col shadow-2xl border-x border-white/[0.06] pb-24">
+    
+    <!-- Ambient Moon & Star Glow -->
+    <div class="pointer-events-none absolute top-0 right-0 w-48 h-48 bg-lavender-500/15 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4"></div>
+    <div class="pointer-events-none absolute top-40 left-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl -translate-x-1/2"></div>
+
+    <!-- Top App Header -->
+    <header class="sticky top-0 z-30 nav-blur px-5 pt-4 pb-3 border-b border-white/[0.06]">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-lavender-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-lavender-500/25">
+            <i data-lucide="moon-star" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <h1 class="text-base font-extrabold tracking-tight text-white leading-tight">Jalur Langit Tracker</h1>
+            <p id="header-greeting" class="text-[11px] text-lavender-300/80 font-medium">Assalamu'alaikum, siap istiqomah hari ini?</p>
+          </div>
+        </div>
+
+        <button onclick="openSettingsModal()" title="Pengaturan & Data" class="w-9 h-9 rounded-xl bg-twilight-800 hover:bg-twilight-700 border border-white/[0.07] flex items-center justify-center text-lavender-300 transition active:scale-95">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Banner Install Aplikasi (Muncul otomatis jika belum diinstall) -->
+      <div id="install-banner" class="hidden mt-3 bg-gradient-to-r from-lavender-600/25 via-indigo-600/25 to-purple-600/25 border border-lavender-400/30 rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-lavender-500/25 text-lavender-300 flex items-center justify-center shrink-0">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-bold text-white truncate">Install Jalur Langit di HP</p>
+            <p class="text-[10.5px] text-lavender-200/80 truncate">Akses cepat dari Home Screen & offline</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="triggerInstallPWA()" class="px-3 py-1.5 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-[11px] font-bold shadow-md shadow-lavender-500/25 transition active:scale-95">
+            Install
+          </button>
+          <button onclick="dismissInstallBanner()" title="Tutup" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white flex items-center justify-center">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Content Container -->
+    <main id="app-content" class="flex-1 px-4 pt-4 space-y-4">
+      <!-- Rendered via JavaScript -->
+    </main>
+
+    <!-- Bottom Navigation Bar (3 Tabs) -->
+    <nav class="fixed bottom-0 z-40 w-full max-w-[460px] nav-blur border-t border-white/[0.08] px-3 py-2">
+      <div class="grid grid-cols-3 gap-1.5">
+        <button onclick="switchTab('hari-ini')" id="nav-hari-ini" class="nav-btn flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all">
+          <i data-lucide="check-circle-2" class="w-5 h-5 mb-1"></i>
+          <span class="text-[11px] font-bold">Hari Ini</span>
+        </button>
+
+        <button onclick="switchTab('doa-syukur')" id="nav-doa-syukur" class="nav-btn flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all">
+          <i data-lucide="heart-handshake" class="w-5 h-5 mb-1"></i>
+          <span class="text-[11px] font-bold">Doa & Syukur</span>
+        </button>
+
+        <button onclick="switchTab('perkembangan')" id="nav-perkembangan" class="nav-btn flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all">
+          <i data-lucide="bar-chart-3" class="w-5 h-5 mb-1"></i>
+          <span class="text-[11px] font-bold">Perkembangan</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- MODAL: Tambah Amalan Kustom -->
+  <div id="modal-add-amalan" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-[420px] bg-twilight-800 border border-lavender-500/25 rounded-3xl p-5 shadow-2xl view-animate">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-lavender-500/20 flex items-center justify-center text-lavender-400">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Tambah Amalan Baru</h3>
+        </div>
+        <button onclick="closeAddAmalanModal()" class="w-8 h-8 rounded-xl bg-twilight-700 text-slate-300 flex items-center justify-center hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAddAmalan(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-lavender-300 mb-1">Nama Amalan</label>
+          <input type="text" id="input-amalan-title" required placeholder="Contoh: Shalat Rawatib Ba'diyah Isya" class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-lavender-300 mb-1">Target / Keterangan</label>
+            <input type="text" id="input-amalan-detail" required placeholder="2 rakaat / 1x" class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-lavender-300 mb-1">Jenis Ibadah</label>
+            <select id="input-amalan-type" class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-lavender-500">
+              <option value="sunnah">Shalat Sunnah</option>
+              <option value="amalan">Amalan / Dzikir</option>
+              <option value="wajib">Shalat Wajib</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-lavender-300 mb-1">Waktu Pelaksanaan</label>
+          <select id="input-amalan-category" class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-lavender-500">
+            <option value="Sepertiga Malam">Sepertiga Malam</option>
+            <option value="Subuh & Pagi">Subuh & Pagi</option>
+            <option value="Dzuhur">Dzuhur</option>
+            <option value="Ashar">Ashar</option>
+            <option value="Maghrib">Maghrib</option>
+            <option value="Isya & Malam">Isya & Malam</option>
+          </select>
+        </div>
+
+        <div class="pt-2 flex gap-2.5">
+          <button type="button" onclick="closeAddAmalanModal()" class="flex-1 py-2.5 rounded-xl bg-twilight-700 text-slate-300 text-xs font-bold hover:bg-twilight-600 transition">Batal</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-xs font-bold shadow-lg shadow-lavender-500/30 transition">Simpan Amalan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Info & Reset Data -->
+  <div id="modal-settings" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-[400px] bg-twilight-800 border border-lavender-500/25 rounded-3xl p-5 shadow-2xl view-animate">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="moon-star" class="w-4 h-4 text-lavender-400"></i>
+          Tentang Jalur Langit Tracker
+        </h3>
+        <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-xl bg-twilight-700 text-slate-300 flex items-center justify-center">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed mb-4">
+        Semua progres ibadah harian, daftar hajat, dan jurnal syukur tersimpan otomatis di perangkatmu (<span class="text-lavender-300 font-semibold">Offline-ready</span>). Semoga Allah mudahkan setiap ikhtiar jalur langitmu.
+      </p>
+
+      <div class="bg-twilight-900/90 border border-white/[0.07] rounded-2xl p-3.5 mb-4 space-y-2">
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Total Hari Tercatat</span>
+          <span id="stat-total-days" class="font-bold text-white">0 hari</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Total Hajat & Doa</span>
+          <span id="stat-total-hajats" class="font-bold text-lavender-300">0 doa</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Catatan Jurnal Syukur</span>
+          <span id="stat-total-journals" class="font-bold text-amber-400">0 jurnal</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <button id="btn-install-modal" onclick="triggerInstallPWA()" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-lavender-500 to-indigo-600 hover:opacity-95 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-lavender-500/25 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          Install Aplikasi ke Layar Utama HP
+        </button>
+        <button onclick="resetToFreshEmpty()" class="w-full py-2.5 px-4 rounded-xl bg-twilight-700 hover:bg-twilight-600 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition">
+          <i data-lucide="eraser" class="w-3.5 h-3.5 text-amber-400"></i>
+          Kosongkan Riwayat (Mulai dari 0)
+        </button>
+        <button onclick="resetToDemoData()" class="w-full py-2.5 px-4 rounded-xl bg-lavender-500/20 hover:bg-lavender-500/30 border border-lavender-500/30 text-lavender-300 text-xs font-bold flex items-center justify-center gap-2 transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          Muat Ulang Data Contoh (20 Hari)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Panduan Install Manual (iOS Safari / Browser Tanpa Prompt Otomatis) -->
+  <div id="modal-install-guide" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-[400px] bg-twilight-800 border border-lavender-500/30 rounded-3xl p-5 shadow-2xl view-animate space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-lavender-500/20 text-lavender-300 flex items-center justify-center">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Cara Install di HP</h3>
+        </div>
+        <button onclick="closeInstallGuideModal()" class="w-8 h-8 rounded-xl bg-twilight-700 text-slate-300 flex items-center justify-center">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-300">
+        <div class="bg-twilight-900/90 border border-white/[0.07] rounded-2xl p-3.5 space-y-1.5">
+          <p class="font-bold text-lavender-300 flex items-center gap-1.5">
+            <span>🤖</span> Android (Chrome / Edge / Samsung)
+          </p>
+          <p class="leading-relaxed">Ketuk ikon menu <strong class="text-white">⋮ (Titik Tiga)</strong> di pojok kanan atas browser, lalu pilih <strong class="text-white">"Tambahkan ke Layar utama"</strong> atau <strong class="text-white">"Install aplikasi"</strong>.</p>
+        </div>
+
+        <div class="bg-twilight-900/90 border border-white/[0.07] rounded-2xl p-3.5 space-y-1.5">
+          <p class="font-bold text-amber-300 flex items-center gap-1.5">
+            <span>🍎</span> iPhone / iPad (Safari)
+          </p>
+          <p class="leading-relaxed">Ketuk ikon <strong class="text-white">Share (Kotak dengan panah ke atas)</strong> di bagian bawah Safari, lalu gulir dan pilih <strong class="text-white">"Add to Home Screen" (Tambah ke Layar Utama)</strong>.</p>
+        </div>
+      </div>
+
+      <button onclick="closeInstallGuideModal()" class="w-full py-2.5 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-xs font-bold transition">
+        Mengerti, Jazakallah Khairan
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300">
+    <div id="toast-inner" class="bg-twilight-750 border border-lavender-400/30 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-xl flex items-center gap-2">
+      <span id="toast-icon">✨</span>
+      <span id="toast-msg">Tersimpan</span>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. KONFIGURASI & DATA DEFAULT JALUR LANGIT TRACKER
+    // =========================================================================
+    const STORAGE_KEYS = {
+      AMALAN_LIST: 'jlt_amalan_list_v2',
+      DAILY_LOGS: 'jlt_daily_logs_v2',
+      HAJATS: 'jlt_hajats_v2',
+      JOURNALS: 'jlt_journals_v2',
+      SEEDED: 'jlt_seeded_v2'
+    };
+
+    const CATEGORIES = [
+      'Sepertiga Malam',
+      'Subuh & Pagi',
+      'Dzuhur',
+      'Ashar',
+      'Maghrib',
+      'Isya & Malam'
+    ];
+
+    const DEFAULT_AMALAN = [
+      // Sepertiga Malam
+      { id: 'tahajud', title: 'Shalat Tahajud', detail: '4 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'sparkles', custom: false },
+      { id: 'hajat', title: 'Shalat Hajat', detail: '2 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'heart', custom: false },
+      { id: 'taubat', title: 'Shalat Taubat', detail: '2 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'hand-heart', custom: false },
+      { id: 'witir', title: 'Shalat Witir', detail: '3 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'moon', custom: false },
+
+      // Subuh & Pagi
+      { id: 'subuh', title: 'Shalat Subuh', detail: '2 rakaat • Wajib', category: 'Subuh & Pagi', type: 'wajib', icon: 'sunrise', custom: false },
+      { id: 'waqiah', title: "Surah Al-Waqi'ah", detail: '1x setelah Subuh', category: 'Subuh & Pagi', type: 'amalan', icon: 'book-open', custom: false },
+      { id: 'dhuha', title: 'Shalat Dhuha', detail: '4 rakaat', category: 'Subuh & Pagi', type: 'sunnah', icon: 'sun', custom: false },
+      { id: 'addhuha', title: 'Surah Ad-Dhuha', detail: '1x setelah Dhuha', category: 'Subuh & Pagi', type: 'amalan', icon: 'book-open', custom: false },
+      { id: 'sedekah_subuh', title: 'Sedekah Subuh', detail: '1x rutin pagi', category: 'Subuh & Pagi', type: 'amalan', icon: 'coins', custom: false },
+      { id: 'dzikir_pagi', title: 'Dzikir Pagi', detail: "Al-Ma'tsurat", category: 'Subuh & Pagi', type: 'amalan', icon: 'sparkles', custom: false },
+
+      // Dzuhur
+      { id: 'dzuhur', title: 'Shalat Dzuhur', detail: '4 rakaat • Wajib', category: 'Dzuhur', type: 'wajib', icon: 'sun', custom: false },
+      { id: 'rawatib_dzuhur', title: "Shalat Qobliyah & Ba'diyah Dzuhur", detail: '4 + 2 rakaat', category: 'Dzuhur', type: 'sunnah', icon: 'sparkles', custom: false },
+      { id: 'arrahman', title: 'Surah Ar-Rahman', detail: '1x setelah Dzuhur', category: 'Dzuhur', type: 'amalan', icon: 'book-open', custom: false },
+
+      // Ashar
+      { id: 'ashar', title: 'Shalat Ashar', detail: '4 rakaat • Wajib', category: 'Ashar', type: 'wajib', icon: 'cloud-sun', custom: false },
+      { id: 'assajadah', title: 'Surah As-Sajadah', detail: '1x setelah Ashar', category: 'Ashar', type: 'amalan', icon: 'book-open', custom: false },
+      { id: 'dzikir_petang', title: 'Dzikir Petang', detail: "Al-Ma'tsurat", category: 'Ashar', type: 'amalan', icon: 'sunset', custom: false },
+
+      // Maghrib
+      { id: 'maghrib', title: 'Shalat Maghrib', detail: '3 rakaat • Wajib', category: 'Maghrib', type: 'wajib', icon: 'moon', custom: false },
+      { id: 'yasin', title: 'Surah Yasin', detail: '1x setelah Maghrib', category: 'Maghrib', type: 'amalan', icon: 'book-open', custom: false },
+      { id: 'tilawah', title: "Tilawah Al-Qur'an", detail: 'Minimal 2 lembar', category: 'Maghrib', type: 'amalan', icon: 'bookmark', custom: false },
+
+      // Isya & Malam
+      { id: 'isya', title: 'Shalat Isya', detail: '4 rakaat • Wajib', category: 'Isya & Malam', type: 'wajib', icon: 'moon-star', custom: false },
+      { id: 'almulk', title: 'Surah Al-Mulk', detail: '1x sebelum tidur', category: 'Isya & Malam', type: 'amalan', icon: 'book-open', custom: false },
+      { id: 'sholawat', title: 'Sholawat Nabi', detail: 'Minimal 100x', category: 'Isya & Malam', type: 'amalan', icon: 'heart', custom: false },
+      { id: 'istighfar', title: 'Istighfar Harian', detail: 'Minimal 100x', category: 'Isya & Malam', type: 'amalan', icon: 'shield-check', custom: false },
+    ];
+
+    // =========================================================================
+    // 2. STATE APLIKASI
+    // =========================================================================
+    const TODAY_STR = getLocalDateString(new Date());
+
+    let state = {
+      activeTab: 'hari-ini', // 'hari-ini' | 'doa-syukur' | 'perkembangan'
+      selectedDate: TODAY_STR,
+      doaSubTab: 'doa', // 'doa' | 'syukur'
+      hajatFilter: 'all', // 'all' | 'active' | 'answered'
+      selectedMood: 'Tenang 🕊️',
+      statsMode: 'bulanan', // 'mingguan' | 'bulanan'
+      statsMonthOffset: 0,
+      statsWeekOffset: 0,
+      selectedBarDate: null,
+      amalanList: [],
+      dailyLogs: {}, // { 'YYYY-MM-DD': ['subuh', 'tahajud', ...] }
+      hajats: [],
+      journals: []
+    };
+
+    // =========================================================================
+    // 3. HELPER TANGGAL & FORMAT INDONESIA
+    // =========================================================================
+    function getLocalDateString(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function parseDateStr(str) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatDisplayDate(str) {
+      const [y, m, d] = str.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function formatLongDateIndo(str) {
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const dt = parseDateStr(str);
+      return `${days[dt.getDay()]}, ${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
+    }
+
+    function formatMonthYearIndo(year, monthIdx) {
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      return `${months[monthIdx]} ${year}`;
+    }
+
+    function addDays(dateStr, delta) {
+      const dt = parseDateStr(dateStr);
+      dt.setDate(dt.getDate() + delta);
+      return getLocalDateString(dt);
+    }
+
+    // =========================================================================
+    // 4. INISIALISASI STORAGE & DATA SIMULASI REALISTIS
+    // =========================================================================
+    function initData() {
+      const alreadySeeded = localStorage.getItem(STORAGE_KEYS.SEEDED);
+      if (!alreadySeeded) {
+        seedInitialData();
+      } else {
+        state.amalanList = JSON.parse(localStorage.getItem(STORAGE_KEYS.AMALAN_LIST) || '[]');
+        if (!state.amalanList.length) state.amalanList = [...DEFAULT_AMALAN];
+        state.dailyLogs = JSON.parse(localStorage.getItem(STORAGE_KEYS.DAILY_LOGS) || '{}');
+        state.hajats = JSON.parse(localStorage.getItem(STORAGE_KEYS.HAJATS) || '[]');
+        state.journals = JSON.parse(localStorage.getItem(STORAGE_KEYS.JOURNALS) || '[]');
+      }
+    }
+
+    function seedInitialData() {
+      state.amalanList = [...DEFAULT_AMALAN];
+      const logs = {};
+      const allIds = state.amalanList.map(a => a.id);
+      const wajibIds = state.amalanList.filter(a => a.type === 'wajib').map(a => a.id);
+
+      // Seed 19 hari sebelumnya dengan variasi progres yang alami
+      for (let i = 19; i >= 1; i--) {
+        const dStr = addDays(TODAY_STR, -i);
+        // Mayoritas hari shalat wajib 5/5 lengkap, sebagian 4/5
+        const completed = new Set(i % 6 === 0 ? wajibIds.slice(0, 4) : wajibIds);
+        // Tambahkan amalan sunnah & surah secara konsisten (sekitar 65% - 92%)
+        const targetCount = 14 + ((i * 7) % 8);
+        for (let j = 0; j < allIds.length && completed.size < targetCount; j++) {
+          const idx = (i * 3 + j * 5) % allIds.length;
+          completed.add(allIds[idx]);
+        }
+        logs[dStr] = Array.from(completed);
+      }
+
+      // Hari ini: sudah tercentang sebagian agar user langsung melihat progres & bisa lanjut mencentang
+      logs[TODAY_STR] = [
+        'tahajud', 'hajat', 'taubat', 'witir',
+        'subuh', 'waqiah', 'dhuha', 'addhuha', 'sedekah_subuh', 'dzikir_pagi',
+        'dzuhur', 'arrahman', 'ashar', 'dzikir_petang', 'sholawat'
+      ];
+
+      state.dailyLogs = logs;
+
+      // Sample Catatan Doa & Hajat
+      state.hajats = [
+        {
+          id: 'hajat-1',
+          title: 'Rezeki berkah, halal & melimpah untuk keluarga',
+          detail: 'Ya Allah, lapangkanlah pintu rezeki kami dari arah yang tidak disangka-sangka, lunaskan segala amanah dan jadikan kami pribadi yang dermawan.',
+          category: 'Rezeki',
+          prayerCount: 24,
+          answered: false,
+          createdAt: addDays(TODAY_STR, -14),
+          answeredAt: null
+        },
+        {
+          id: 'hajat-2',
+          title: 'Orang tua selalu sehat, panjang umur & husnul khotimah',
+          detail: 'Rabbighfir lii wa liwaalidayya warhamhumaa kamaa rabbayaanii shaghiiraa. Sehatkan ayah dan ibu selalu.',
+          category: 'Keluarga',
+          prayerCount: 31,
+          answered: false,
+          createdAt: addDays(TODAY_STR, -18),
+          answeredAt: null
+        },
+        {
+          id: 'hajat-3',
+          title: 'Dimudahkan urusan pekerjaan & proyek baru bulan ini',
+          detail: 'Alhamdulillah setelah rutin tahajud, Al-Waqi\'ah dan sedekah subuh, Allah bukakan jalan yang jauh lebih baik dari ekspektasi.',
+          category: 'Karier',
+          prayerCount: 19,
+          answered: true,
+          createdAt: addDays(TODAY_STR, -21),
+          answeredAt: addDays(TODAY_STR, -3)
+        }
+      ];
+
+      // Sample Jurnal Syukur
+      state.journals = [
+        {
+          id: 'jurnal-1',
+          date: addDays(TODAY_STR, -1),
+          mood: 'Tenang 🕊️',
+          items: [
+            'Masih diberi bangun di sepertiga malam untuk Tahajud tanpa alarm',
+            'Rezeki makan siang yang nikmat dan tubuh yang sehat',
+            'Hati terasa lebih lapang menghadapi ujian pekerjaan'
+          ]
+        },
+        {
+          id: 'jurnal-2',
+          date: addDays(TODAY_STR, -3),
+          mood: 'Terharu 🥹',
+          items: [
+            'Satu hajat besar yang didoakan berbulan-bulan akhirnya terkabul',
+            'Keluarga di rumah dalam keadaan sehat wal afiat',
+            'Bisa konsisten membaca Al-Mulk sebelum tidur'
+          ]
+        }
+      ];
+
+      saveAllToStorage();
+      localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
+    }
+
+    function saveAllToStorage() {
+      localStorage.setItem(STORAGE_KEYS.AMALAN_LIST, JSON.stringify(state.amalanList));
+      localStorage.setItem(STORAGE_KEYS.DAILY_LOGS, JSON.stringify(state.dailyLogs));
+      localStorage.setItem(STORAGE_KEYS.HAJATS, JSON.stringify(state.hajats));
+      localStorage.setItem(STORAGE_KEYS.JOURNALS, JSON.stringify(state.journals));
+    }
+
+    // =========================================================================
+    // 5. KALKULASI METRIK & STREAK
+    // =========================================================================
+    function getCompletedIdsForDate(dateStr) {
+      const raw = state.dailyLogs[dateStr] || [];
+      const validSet = new Set(state.amalanList.map(a => a.id));
+      return raw.filter(id => validSet.has(id));
+    }
+
+    function calculateStreak() {
+      let streak = 0;
+      let cursor = TODAY_STR;
+
+      // Jika hari ini belum ada yang dicentang, cek mulai dari kemarin agar streak tidak langsung putus sebelum hari berakhir
+      if (getCompletedIdsForDate(cursor).length === 0) {
+        cursor = addDays(cursor, -1);
+      }
+
+      while (true) {
+        const done = getCompletedIdsForDate(cursor).length;
+        if (done > 0) {
+          streak++;
+          cursor = addDays(cursor, -1);
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    // =========================================================================
+    // 6. NAVIGASI TAB & RENDER UTAMA
+    // =========================================================================
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      updateNavButtons();
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateNavButtons() {
+      const tabs = ['hari-ini', 'doa-syukur', 'perkembangan'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        if (!btn) return;
+        if (t === state.activeTab) {
+          btn.className = 'nav-btn flex flex-col items-center justify-center py-2 px-2 rounded-2xl bg-lavender-500/20 text-lavender-300 border border-lavender-500/30 transition-all';
+        } else {
+          btn.className = 'nav-btn flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-slate-400 hover:text-slate-200 border border-transparent transition-all';
+        }
+      });
+    }
+
+    function renderApp() {
+      const container = document.getElementById('app-content');
+      if (state.activeTab === 'hari-ini') {
+        container.innerHTML = renderHariIniView();
+      } else if (state.activeTab === 'doa-syukur') {
+        container.innerHTML = renderDoaSyukurView();
+      } else if (state.activeTab === 'perkembangan') {
+        container.innerHTML = renderPerkembanganView();
+      }
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // 7. VIEW 1: HARI INI (CHECKLIST AMALAN & SHALAT SUNNAH)
+    // =========================================================================
+    function renderHariIniView() {
+      const completedIds = getCompletedIdsForDate(state.selectedDate);
+      const completedSet = new Set(completedIds);
+
+      const wajibList = state.amalanList.filter(a => a.type === 'wajib');
+      const nonWajibList = state.amalanList.filter(a => a.type !== 'wajib');
+
+      const wajibDone = wajibList.filter(a => completedSet.has(a.id)).length;
+      const nonWajibDone = nonWajibList.filter(a => completedSet.has(a.id)).length;
+
+      const totalAmalan = state.amalanList.length;
+      const totalDone = completedIds.length;
+      const remaining = Math.max(0, totalAmalan - totalDone);
+      const streak = calculateStreak();
+      const isToday = state.selectedDate === TODAY_STR;
+
+      // Generate Dot Progress Bar (sesuai referensi visual screenshot)
+      const dotsHtml = state.amalanList.map((item, idx) => {
+        const isFilled = idx < totalDone;
+        return `<span class="h-2 flex-1 rounded-full transition-all duration-300 ${isFilled ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.65)]' : 'bg-white/20'}"></span>`;
+      }).join('');
+
+      // Render Daftar Amalan per Kategori Waktu
+      const categoriesHtml = CATEGORIES.map(cat => {
+        const itemsInCat = state.amalanList.filter(a => a.category === cat);
+        if (itemsInCat.length === 0) return '';
+
+        const catDone = itemsInCat.filter(a => completedSet.has(a.id)).length;
+
+        const itemsHtml = itemsInCat.map(item => {
+          const checked = completedSet.has(item.id);
+          const badgeColor = item.type === 'wajib'
+            ? 'bg-amber-500/15 text-amber-300 border-amber-500/25'
+            : item.type === 'sunnah'
+              ? 'bg-lavender-500/15 text-lavender-300 border-lavender-500/25'
+              : 'bg-sky-500/15 text-sky-300 border-sky-500/25';
+
+          const badgeLabel = item.type === 'wajib' ? 'Wajib' : item.type === 'sunnah' ? 'Sunnah' : 'Amalan';
+
+          return `
+            <div onclick="toggleAmalan('${item.id}')" class="group cursor-pointer select-none card-twilight hover:border-lavender-400/35 rounded-2xl p-3.5 flex items-center justify-between gap-3 transition-all active:scale-[0.99] ${checked ? 'bg-twilight-800/75' : ''}">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${checked ? 'bg-emerald-500/15 text-emerald-400' : 'bg-twilight-700/80 text-lavender-300'}">
+                  <i data-lucide="${item.icon || 'sparkles'}" class="w-4 h-4"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="text-[13.5px] font-bold truncate transition-colors ${checked ? 'text-slate-300 line-through decoration-emerald-400/60' : 'text-white'}">${item.title}</p>
+                    <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md border ${badgeColor}">${badgeLabel}</span>
+                  </div>
+                  <p class="text-[11.5px] text-slate-400 mt-0.5 truncate">${item.detail}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+                ${item.custom ? `
+                  <button onclick="event.stopPropagation(); deleteCustomAmalan('${item.id}')" title="Hapus amalan kustom" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 flex items-center justify-center transition">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                ` : ''}
+                <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${checked ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/35 animate-check' : 'border-2 border-white/20 bg-twilight-900/60 group-hover:border-lavender-400/60'}">
+                  ${checked ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <section class="space-y-2.5 pt-1">
+            <div class="flex items-center justify-between px-1">
+              <h3 class="text-sm font-bold text-white tracking-tight">${cat}</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-twilight-800 text-lavender-300 border border-white/[0.06]">${catDone}/${itemsInCat.length}</span>
+            </div>
+            <div class="space-y-2">
+              ${itemsHtml}
+            </div>
+          </section>
+        `;
+      }).join('');
+
+      return `
+        <div class="space-y-4 view-animate">
+          <!-- Title & Date Navigator -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-extrabold text-white tracking-tight">Siap beribadah hari ini?</h2>
+              ${!isToday ? `
+                <button onclick="changeSelectedDate('${TODAY_STR}')" class="text-[11px] font-bold text-lavender-300 bg-lavender-500/15 hover:bg-lavender-500/25 border border-lavender-500/30 px-2.5 py-1 rounded-full transition">
+                  Ke Hari Ini
+                </button>
+              ` : `<span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">Hari Ini</span>`}
+            </div>
+
+            <!-- Date Picker Pill -->
+            <div class="flex items-center gap-2">
+              <button onclick="changeSelectedDate('${addDays(state.selectedDate, -1)}')" class="w-10 h-10 rounded-full card-twilight hover:bg-twilight-700 flex items-center justify-center text-lavender-300 active:scale-95 transition">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+
+              <div class="relative flex-1 h-10 rounded-full card-twilight px-4 flex items-center justify-between">
+                <span class="text-xs font-bold text-white">${formatDisplayDate(state.selectedDate)}</span>
+                <span class="text-[11px] text-slate-400 truncate max-w-[140px]">${formatLongDateIndo(state.selectedDate).split(',')[0]}</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-lavender-300"></i>
+                <input type="date" value="${state.selectedDate}" onchange="changeSelectedDate(this.value)" aria-label="Pilih tanggal ibadah" />
+              </div>
+
+              <button onclick="changeSelectedDate('${addDays(state.selectedDate, 1)}')" class="w-10 h-10 rounded-full card-twilight hover:bg-twilight-700 flex items-center justify-center text-lavender-300 active:scale-95 transition">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Metric Summary Cards -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="card-twilight rounded-2xl p-3 text-center flex flex-col items-center justify-center">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center mb-1.5">
+                <i data-lucide="landmark" class="w-4 h-4"></i>
+              </div>
+              <div class="text-base font-extrabold text-white leading-tight">${wajibDone}/${wajibList.length}</div>
+              <div class="text-[10.5px] font-medium text-slate-400 mt-0.5">Shalat Wajib</div>
+            </div>
+
+            <div class="card-twilight rounded-2xl p-3 text-center flex flex-col items-center justify-center">
+              <div class="w-8 h-8 rounded-xl bg-lavender-500/15 text-lavender-300 flex items-center justify-center mb-1.5">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+              </div>
+              <div class="text-base font-extrabold text-white leading-tight">${nonWajibDone}/${nonWajibList.length}</div>
+              <div class="text-[10.5px] font-medium text-slate-400 mt-0.5">Sunnah & Amalan</div>
+            </div>
+
+            <div class="card-twilight rounded-2xl p-3 text-center flex flex-col items-center justify-center">
+              <div class="w-8 h-8 rounded-xl bg-orange-500/15 text-orange-400 flex items-center justify-center mb-1.5">
+                <span class="text-sm">🔥</span>
+              </div>
+              <div class="text-base font-extrabold text-white leading-tight">${streak}</div>
+              <div class="text-[10.5px] font-medium text-slate-400 mt-0.5">Hari Streak</div>
+            </div>
+          </div>
+
+          <!-- Progres Hari Ini Hero Card -->
+          <div class="progress-hero rounded-3xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-white">Progres hari ini</span>
+              <span class="text-sm font-extrabold text-lavender-300">${totalDone}/${totalAmalan}</span>
+            </div>
+
+            <!-- Horizontal Amber Dot Progress Bar -->
+            <div class="flex items-center gap-1 py-0.5">
+              ${dotsHtml}
+            </div>
+
+            <div class="flex items-center justify-between text-[11.5px]">
+              <span class="text-lavender-200/90 font-medium">
+                ${remaining === 0 ? 'MasyaAllah! Semua target amalan hari ini lengkap ✨' : `${remaining} amalan lagi menuju lengkap`}
+              </span>
+              <span class="font-bold text-amber-300">${totalAmalan > 0 ? Math.round((totalDone / totalAmalan) * 100) : 0}%</span>
+            </div>
+          </div>
+
+          <!-- Checklist Amalan per Waktu -->
+          <div class="space-y-4">
+            ${categoriesHtml}
+          </div>
+
+          <!-- Tombol Tambah Amalan Kustom -->
+          <div class="pt-2 pb-2">
+            <button onclick="openAddAmalanModal()" class="w-full py-3.5 rounded-2xl border border-dashed border-lavender-400/40 bg-lavender-500/10 hover:bg-lavender-500/20 text-lavender-300 text-xs font-bold flex items-center justify-center gap-2 transition active:scale-[0.99]">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              Tambah Target Amalan / Sholat Sunnah Sendiri
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 8. VIEW 2: DOA & SYUKUR (CATATAN HAJAT + JURNAL SYUKUR)
+    // =========================================================================
+    function renderDoaSyukurView() {
+      const answeredCount = state.hajats.filter(h => h.answered).length;
+
+      return `
+        <div class="space-y-4 view-animate">
+          <div>
+            <h2 class="text-lg font-extrabold text-white tracking-tight">Langitkan Doa & Syukurmu</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Catat hajat terbaikmu dan syukuri nikmat Allah setiap hari.</p>
+          </div>
+
+          <!-- Segmented Sub-Tab Switcher -->
+          <div class="grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-twilight-800 border border-white/[0.07]">
+            <button onclick="switchDoaSubTab('doa')" class="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${state.doaSubTab === 'doa' ? 'bg-lavender-500 text-white shadow-md shadow-lavender-500/25' : 'text-slate-400 hover:text-white'}">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              Catatan Doa & Hajat (${state.hajats.length})
+            </button>
+            <button onclick="switchDoaSubTab('syukur')" class="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${state.doaSubTab === 'syukur' ? 'bg-lavender-500 text-white shadow-md shadow-lavender-500/25' : 'text-slate-400 hover:text-white'}">
+              <i data-lucide="book-heart" class="w-3.5 h-3.5"></i>
+              Jurnal Syukur (${state.journals.length})
+            </button>
+          </div>
+
+          ${state.doaSubTab === 'doa' ? renderHajatSection(answeredCount) : renderSyukurSection()}
+        </div>
+      `;
+    }
+
+    function renderHajatSection(answeredCount) {
+      const filteredHajats = state.hajats.filter(h => {
+        if (state.hajatFilter === 'active') return !h.answered;
+        if (state.hajatFilter === 'answered') return h.answered;
+        return true;
+      });
+
+      const hajatCards = filteredHajats.length === 0 ? `
+        <div class="card-twilight rounded-3xl p-6 text-center space-y-2">
+          <div class="w-11 h-11 rounded-2xl bg-lavender-500/15 text-lavender-300 flex items-center justify-center mx-auto">
+            <i data-lucide="cloud-moon" class="w-5 h-5"></i>
+          </div>
+          <p class="text-sm font-bold text-white">Belum ada catatan hajat di kategori ini</p>
+          <p class="text-xs text-slate-400">Tuliskan doa terbaikmu di form atas, lalu langitkan di sepertiga malam.</p>
+        </div>
+      ` : filteredHajats.map(h => `
+        <div class="card-twilight rounded-3xl p-4 space-y-3 transition-all ${h.answered ? 'border-emerald-500/35 bg-gradient-to-br from-emerald-950/35 to-twilight-800' : ''}">
+          <div class="flex items-start justify-between gap-2">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[10.5px] font-bold px-2.5 py-0.5 rounded-full bg-lavender-500/15 text-lavender-300 border border-lavender-500/25">${h.category}</span>
+                ${h.answered ? `
+                  <span class="text-[10.5px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">Terkabul Alhamdulillah ✨</span>
+                ` : `
+                  <span class="text-[10.5px] font-medium text-slate-400">Diikhtiarkan sejak ${formatDisplayDate(h.createdAt)}</span>
+                `}
+              </div>
+              <h4 class="text-sm font-extrabold text-white leading-snug pt-0.5">${h.title}</h4>
+            </div>
+
+            <button onclick="deleteHajat('${h.id}')" title="Hapus doa" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center shrink-0 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          ${h.detail ? `<p class="text-xs text-slate-300/90 leading-relaxed bg-twilight-900/65 p-3 rounded-2xl border border-white/[0.04]">"${h.detail}"</p>` : ''}
+
+          <div class="flex items-center justify-between gap-2 pt-1">
+            <button onclick="incrementPrayer('${h.id}')" class="flex-1 py-2 px-3 rounded-xl bg-lavender-500/15 hover:bg-lavender-500/25 border border-lavender-500/30 text-lavender-200 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <span>🤲</span>
+              <span>Aamiin-kan (${h.prayerCount}x didoakan)</span>
+            </button>
+
+            <button onclick="toggleHajatAnswered('${h.id}')" class="py-2 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 ${h.answered ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25' : 'bg-twilight-700 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-white/10'}">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              <span>${h.answered ? 'Terkabul' : 'Tandai Terkabul'}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="space-y-4">
+          <!-- Form Tambah Hajat Baru -->
+          <form onsubmit="handleAddHajat(event)" class="card-twilight rounded-3xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-lavender-300 flex items-center gap-1.5">
+                <i data-lucide="pen-line" class="w-3.5 h-3.5"></i>
+                Tulis Hajat / Doa Baru
+              </h3>
+              <span class="text-[11px] text-emerald-400 font-semibold">${answeredCount} Terkabul</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <input type="text" id="hajat-title" required placeholder="Judul hajatmu..." class="col-span-2 bg-twilight-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
+              <select id="hajat-category" class="bg-twilight-900 border border-white/10 rounded-xl px-2.5 py-2.5 text-xs text-white focus:outline-none focus:border-lavender-500">
+                <option value="Rezeki">Rezeki</option>
+                <option value="Keluarga">Keluarga</option>
+                <option value="Jodoh">Jodoh</option>
+                <option value="Karier">Karier</option>
+                <option value="Kesehatan">Kesehatan</option>
+                <option value="Ibadah">Ibadah</option>
+              </select>
+            </div>
+
+            <textarea id="hajat-detail" rows="2" placeholder="Tuliskan detail doa atau harapan spesifikmu kepada Allah..." class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500"></textarea>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-xs font-bold shadow-lg shadow-lavender-500/25 flex items-center justify-center gap-1.5 transition active:scale-[0.99]">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              Simpan ke Daftar Langit
+            </button>
+          </form>
+
+          <!-- Filter Pills -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+            <button onclick="setHajatFilter('all')" class="px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition ${state.hajatFilter === 'all' ? 'bg-lavender-500 text-white' : 'bg-twilight-800 text-slate-400 hover:text-white'}">
+              Semua (${state.hajats.length})
+            </button>
+            <button onclick="setHajatFilter('active')" class="px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition ${state.hajatFilter === 'active' ? 'bg-lavender-500 text-white' : 'bg-twilight-800 text-slate-400 hover:text-white'}">
+              Sedang Diikhtiarkan (${state.hajats.filter(h => !h.answered).length})
+            </button>
+            <button onclick="setHajatFilter('answered')" class="px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition ${state.hajatFilter === 'answered' ? 'bg-emerald-500 text-white' : 'bg-twilight-800 text-slate-400 hover:text-white'}">
+              Terkabul ✨ (${answeredCount})
+            </button>
+          </div>
+
+          <!-- Daftar Kartu Hajat -->
+          <div class="space-y-3">
+            ${hajatCards}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSyukurSection() {
+      const moods = ['Tenang 🕊️', 'Bersyukur ✨', 'Penuh Harap 🤲', 'Terharu 🥹'];
+      const existingToday = state.journals.find(j => j.date === state.selectedDate);
+
+      const pastJournalsHtml = state.journals.length === 0 ? `
+        <div class="card-twilight rounded-3xl p-6 text-center space-y-1.5">
+          <p class="text-sm font-bold text-white">Belum ada catatan syukur</p>
+          <p class="text-xs text-slate-400">Mulai tulis 3 nikmat kecil maupun besar yang kamu rasakan hari ini.</p>
+        </div>
+      ` : state.journals.map(j => `
+        <div class="card-twilight rounded-3xl p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-extrabold text-white">${formatLongDateIndo(j.date)}</span>
+              <span class="text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">${j.mood}</span>
+            </div>
+            <button onclick="deleteJournal('${j.id}')" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <ul class="space-y-1.5 pt-1">
+            ${j.items.map((txt, i) => `
+              <li class="flex items-start gap-2 text-xs text-slate-300">
+                <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">${i + 1}</span>
+                <span>${txt}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `).join('');
+
+      return `
+        <div class="space-y-4">
+          <!-- Form Jurnal Syukur Harian -->
+          <form onsubmit="handleSaveJournal(event)" class="card-twilight rounded-3xl p-4 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-300">Jurnal Syukur Harian</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Tanggal: ${formatDisplayDate(state.selectedDate)}</p>
+              </div>
+              <span class="text-lg">🌿</span>
+            </div>
+
+            <!-- Mood / Kondisi Hati -->
+            <div>
+              <label class="block text-[11px] font-semibold text-lavender-300 mb-1.5">Bagaimana kondisi hatimu hari ini?</label>
+              <div class="grid grid-cols-2 gap-1.5">
+                ${moods.map(m => `
+                  <button type="button" onclick="selectMood('${m}')" class="py-2 px-2.5 rounded-xl text-[11px] font-bold border text-left transition ${state.selectedMood === m ? 'bg-lavender-500/20 border-lavender-400 text-white' : 'bg-twilight-900 border-white/[0.07] text-slate-400 hover:text-slate-200'}">
+                    ${m}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- 3 Hal yang Disyukuri -->
+            <div class="space-y-2">
+              <label class="block text-[11px] font-semibold text-lavender-300">Apa 3 hal yang kamu syukuri hari ini?</label>
+              <input type="text" id="syukur-1" required value="${existingToday?.items?.[0] || ''}" placeholder="1. Alhamdulillah masih diberi nikmat sehat & iman..." class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
+              <input type="text" id="syukur-2" value="${existingToday?.items?.[1] || ''}" placeholder="2. Nikmat kecil yang membuatmu tersenyum hari ini..." class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
+              <input type="text" id="syukur-3" value="${existingToday?.items?.[2] || ''}" placeholder="3. Kebaikan orang sekitar atau kemudahan urusan..." class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-lavender-500 to-indigo-600 hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-lavender-500/25 flex items-center justify-center gap-1.5 transition active:scale-[0.99]">
+              <i data-lucide="bookmark-check" class="w-4 h-4"></i>
+              Simpan Jurnal Syukur
+            </button>
+          </form>
+
+          <!-- Timeline Jurnal Syukur -->
+          <div class="space-y-2.5">
+            <h3 class="text-sm font-bold text-white px-1">Catatan Nikmat Sebelumnya</h3>
+            <div class="space-y-3">
+              ${pastJournalsHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 9. VIEW 3: PERKEMBANGAN (STATISTIK MINGGUAN & BULANAN)
+    // =========================================================================
+    function renderPerkembanganView() {
+      const totalAmalanCount = state.amalanList.length;
+      const wajibIds = state.amalanList.filter(a => a.type === 'wajib').map(a => a.id);
+
+      // Tentukan daftar tanggal dalam periode aktif (Mingguan = 7 hari, Bulanan = seluruh hari pada bulan tsb)
+      let periodDates = [];
+      let periodLabel = '';
+
+      if (state.statsMode === 'bulanan') {
+        const base = parseDateStr(TODAY_STR);
+        base.setDate(1);
+        base.setMonth(base.getMonth() + state.statsMonthOffset);
+        const year = base.getFullYear();
+        const month = base.getMonth();
+        periodLabel = formatMonthYearIndo(year, month);
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dt = new Date(year, month, d);
+          periodDates.push(getLocalDateString(dt));
+        }
+      } else {
+        // Mingguan (7 hari berakhir di TODAY_STR + offset*7)
+        const endDateStr = addDays(TODAY_STR, state.statsWeekOffset * 7);
+        const startDateStr = addDays(endDateStr, -6);
+        for (let i = 0; i < 7; i++) {
+          periodDates.push(addDays(startDateStr, i));
+        }
+        periodLabel = `${formatDisplayDate(startDateStr).slice(0, 5)} – ${formatDisplayDate(endDateStr)}`;
+      }
+
+      // Hanya hitung rata-rata hingga hari ini (tidak menghitung hari masa depan)
+      const elapsedDates = periodDates.filter(d => d <= TODAY_STR);
+      let sumPct = 0;
+      let wajibCompleteDays = 0;
+      let totalAmalanCompletedInPeriod = 0;
+
+      const dailySeries = periodDates.map(dStr => {
+        const doneIds = getCompletedIdsForDate(dStr);
+        const doneSet = new Set(doneIds);
+        const pct = totalAmalanCount > 0 ? Math.round((doneIds.length / totalAmalanCount) * 100) : 0;
+
+        if (dStr <= TODAY_STR) {
+          sumPct += pct;
+          totalAmalanCompletedInPeriod += doneIds.length;
+          if (wajibIds.length > 0 && wajibIds.every(id => doneSet.has(id))) {
+            wajibCompleteDays++;
+          }
+        }
+
+        return {
+          date: dStr,
+          dayNum: Number(dStr.split('-')[2]),
+          pct,
+          doneCount: doneIds.length,
+          isFuture: dStr > TODAY_STR
+        };
+      });
+
+      const activeDaysDivisor = Math.max(1, elapsedDates.length);
+      const avgPct = Math.round(sumPct / activeDaysDivisor);
+
+      // Selected bar tooltip detail
+      const activeBar = dailySeries.find(b => b.date === state.selectedBarDate) || dailySeries.find(b => b.date === TODAY_STR) || dailySeries[dailySeries.length - 1];
+
+      // Per Amalan Breakdown (Top amalan & kategori)
+      const perAmalanStats = state.amalanList.map(item => {
+        let hitCount = 0;
+        elapsedDates.forEach(dStr => {
+          const doneIds = getCompletedIdsForDate(dStr);
+          if (doneIds.includes(item.id)) hitCount++;
+        });
+        const itemPct = elapsedDates.length > 0 ? Math.round((hitCount / elapsedDates.length) * 100) : 0;
+        return { ...item, hitCount, itemPct };
+      });
+
+      // Render Bars
+      const barsHtml = dailySeries.map((bar, idx) => {
+        const showLabel = state.statsMode === 'mingguan' || bar.dayNum === 1 || bar.dayNum % 5 === 0;
+        const isSelected = activeBar && activeBar.date === bar.date;
+        const heightPct = bar.isFuture ? 8 : Math.max(8, bar.pct);
+
+        return `
+          <button type="button" onclick="selectChartBar('${bar.date}')" class="flex-1 h-full flex flex-col items-center justify-end gap-1.5 group focus:outline-none">
+            <div class="w-full flex-1 flex items-end justify-center">
+              <div style="height: ${heightPct}%" class="w-full max-w-[14px] rounded-t-full transition-all duration-300 ${
+                bar.isFuture
+                  ? 'bg-white/[0.06]'
+                  : isSelected
+                    ? 'bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.7)]'
+                    : bar.pct >= 75
+                      ? 'bg-lavender-400 group-hover:bg-lavender-300'
+                      : 'bg-lavender-500/60 group-hover:bg-lavender-400'
+              }"></div>
+            </div>
+            <span class="text-[9.5px] font-bold h-3 leading-none ${isSelected ? 'text-amber-300' : 'text-slate-400'}">
+              ${showLabel ? bar.dayNum : ''}
+            </span>
+          </button>
+        `;
+      }).join('');
+
+      return `
+        <div class="space-y-4 view-animate">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-white tracking-tight">Perkembanganmu</h2>
+            <span class="text-[11px] font-semibold text-lavender-300 bg-lavender-500/15 px-2.5 py-1 rounded-full border border-lavender-500/25">Evaluasi Istiqomah</span>
+          </div>
+
+          <!-- Toggle Mingguan vs Bulanan -->
+          <div class="grid grid-cols-2 gap-1.5 p-1.5 rounded-full bg-twilight-800 border border-white/[0.07]">
+            <button onclick="setStatsMode('mingguan')" class="py-2 rounded-full text-xs font-bold transition ${state.statsMode === 'mingguan' ? 'bg-lavender-400 text-twilight-950 shadow-md' : 'text-slate-300 hover:text-white'}">
+              Mingguan
+            </button>
+            <button onclick="setStatsMode('bulanan')" class="py-2 rounded-full text-xs font-bold transition ${state.statsMode === 'bulanan' ? 'bg-lavender-400 text-twilight-950 shadow-md' : 'text-slate-300 hover:text-white'}">
+              Bulanan
+            </button>
+          </div>
+
+          <!-- Period Navigator (< November 2026 >) -->
+          <div class="flex items-center justify-between px-1">
+            <button onclick="shiftStatsPeriod(-1)" class="w-9 h-9 rounded-full card-twilight hover:bg-twilight-700 flex items-center justify-center text-lavender-300 active:scale-95 transition">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span class="text-sm font-extrabold text-white">${periodLabel}</span>
+            <button onclick="shiftStatsPeriod(1)" class="w-9 h-9 rounded-full card-twilight hover:bg-twilight-700 flex items-center justify-center text-lavender-300 active:scale-95 transition">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- 3 Metric Cards -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="card-twilight rounded-2xl p-3 text-center flex flex-col items-center justify-center">
+              <div class="w-8 h-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center mb-1.5">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
+              </div>
+              <div class="text-base font-extrabold text-white leading-tight">${avgPct}%</div>
+              <div class="text-[10.5px] font-medium text-slate-400 mt-0.5">Rata-rata progres</div>
+            </div>
+
+            <div class="card-twilight rounded-2xl p-3 text-center flex flex-col items-center justify-center">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center mb-1.5">
+                <i data-lucide="landmark" class="w-4 h-4"></i>
+              </div>
+              <div class="text-base font-extrabold text-white leading-tight">${wajibCompleteDays}/${elapsedDates.length}</div>
+              <div class="text-[10.5px] font-medium text-slate-400 mt-0.5">Wajib lengkap</div>
+            </div>
+
+            <div class="card-twilight rounded-2xl p-3 text-center flex flex-col items-center justify-center">
+              <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mb-1.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </div>
+              <div class="text-base font-extrabold text-white leading-tight">${totalAmalanCompletedInPeriod}</div>
+              <div class="text-[10.5px] font-medium text-slate-400 mt-0.5">Amalan selesai</div>
+            </div>
+          </div>
+
+          <!-- Grafik Batang: Progres per hari -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between px-1">
+              <h3 class="text-sm font-bold text-white">Progres per hari</h3>
+              ${activeBar ? `
+                <span class="text-[11px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/25 px-2.5 py-0.5 rounded-full">
+                  ${formatDisplayDate(activeBar.date)} • ${activeBar.doneCount}/${totalAmalanCount} (${activeBar.pct}%)
+                </span>
+              ` : ''}
+            </div>
+
+            <div class="card-twilight rounded-3xl p-4 pt-5">
+              <div class="h-36 flex items-end gap-[3px]">
+                ${barsHtml}
+              </div>
+            </div>
+          </div>
+
+          <!-- Per Amalan Breakdown -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between px-1">
+              <h3 class="text-sm font-bold text-white">Per amalan</h3>
+              <span class="text-[11px] text-slate-400">Konsistensi ${elapsedDates.length} hari</span>
+            </div>
+
+            <div class="space-y-2">
+              ${perAmalanStats.map(item => `
+                <div class="card-twilight rounded-2xl p-3.5 space-y-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-xl bg-twilight-700 text-lavender-300 flex items-center justify-center shrink-0">
+                        <i data-lucide="${item.icon || 'sparkles'}" class="w-4 h-4"></i>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-xs font-bold text-white truncate">${item.title}</p>
+                        <p class="text-[10.5px] text-slate-400">${item.hitCount} dari ${elapsedDates.length} hari</p>
+                      </div>
+                    </div>
+                    <span class="text-xs font-extrabold ${item.itemPct >= 80 ? 'text-emerald-400' : item.itemPct >= 50 ? 'text-lavender-300' : 'text-amber-300'}">${item.itemPct}%</span>
+                  </div>
+                  <div class="w-full h-1.5 rounded-full bg-twilight-900 overflow-hidden">
+                    <div style="width: ${item.itemPct}%" class="h-full rounded-full transition-all duration-500 ${item.itemPct >= 80 ? 'bg-emerald-400' : 'bg-lavender-500'}"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 10. EVENT HANDLERS & INTERAKSI PENGGUNA
+    // =========================================================================
+    function toggleAmalan(amalanId) {
+      const current = new Set(getCompletedIdsForDate(state.selectedDate));
+      let added = false;
+      if (current.has(amalanId)) {
+        current.delete(amalanId);
+      } else {
+        current.add(amalanId);
+        added = true;
+      }
+
+      state.dailyLogs[state.selectedDate] = Array.from(current);
+      saveAllToStorage();
+      renderApp();
+
+      if (added) {
+        const item = state.amalanList.find(a => a.id === amalanId);
+        showToast('Alhamdulillah, ' + (item ? item.title : 'amalan') + ' tercatat!', '✅');
+      }
+    }
+
+    function changeSelectedDate(newDate) {
+      if (!newDate) return;
+      state.selectedDate = newDate;
+      renderApp();
+    }
+
+    function openAddAmalanModal() {
+      const modal = document.getElementById('modal-add-amalan');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.getElementById('input-amalan-title').focus();
+    }
+
+    function closeAddAmalanModal() {
+      const modal = document.getElementById('modal-add-amalan');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleAddAmalan(e) {
+      e.preventDefault();
+      const title = document.getElementById('input-amalan-title').value.trim();
+      const detail = document.getElementById('input-amalan-detail').value.trim();
+      const type = document.getElementById('input-amalan-type').value;
+      const category = document.getElementById('input-amalan-category').value;
+
+      if (!title) return;
+
+      const newAmalan = {
+        id: 'custom-' + Date.now(),
+        title,
+        detail: detail || '1x rutin',
+        category,
+        type,
+        icon: type === 'wajib' ? 'landmark' : type === 'sunnah' ? 'sparkles' : 'star',
+        custom: true
+      };
+
+      state.amalanList.push(newAmalan);
+      saveAllToStorage();
+      e.target.reset();
+      closeAddAmalanModal();
+      renderApp();
+      showToast('Amalan baru berhasil ditambahkan!', '🌙');
+    }
+
+    function deleteCustomAmalan(id) {
+      state.amalanList = state.amalanList.filter(a => a.id !== id);
+      saveAllToStorage();
+      renderApp();
+      showToast('Amalan kustom dihapus', '🗑️');
+    }
+
+    // Sub-tab Doa & Syukur
+    function switchDoaSubTab(sub) {
+      state.doaSubTab = sub;
+      renderApp();
+    }
+
+    function setHajatFilter(filter) {
+      state.hajatFilter = filter;
+      renderApp();
+    }
+
+    function handleAddHajat(e) {
+      e.preventDefault();
+      const title = document.getElementById('hajat-title').value.trim();
+      const category = document.getElementById('hajat-category').value;
+      const detail = document.getElementById('hajat-detail').value.trim();
+
+      if (!title) return;
+
+      state.hajats.unshift({
+        id: 'hajat-' + Date.now(),
+        title,
+        detail,
+        category,
+        prayerCount: 1,
+        answered: false,
+        createdAt: TODAY_STR,
+        answeredAt: null
+      });
+
+      saveAllToStorage();
+      e.target.reset();
+      renderApp();
+      showToast('Hajat tersimpan. Semoga Allah ijabah!', '🤲');
+    }
+
+    function incrementPrayer(hajatId) {
+      const target = state.hajats.find(h => h.id === hajatId);
+      if (!target) return;
+      target.prayerCount += 1;
+      saveAllToStorage();
+      renderApp();
+      showToast("Aamiin Ya Rabbal 'Alamin...", '✨');
+    }
+
+    function toggleHajatAnswered(hajatId) {
+      const target = state.hajats.find(h => h.id === hajatId);
+      if (!target) return;
+      target.answered = !target.answered;
+      target.answeredAt = target.answered ? TODAY_STR : null;
+      saveAllToStorage();
+      renderApp();
+      if (target.answered) {
+        showToast('MasyaAllah, Alhamdulillah terkabul!', '🎉');
+      }
+    }
+
+    function deleteHajat(hajatId) {
+      state.hajats = state.hajats.filter(h => h.id !== hajatId);
+      saveAllToStorage();
+      renderApp();
+      showToast('Catatan doa dihapus', '🗑️');
+    }
+
+    // Jurnal Syukur
+    function selectMood(mood) {
+      state.selectedMood = mood;
+      renderApp();
+    }
+
+    function handleSaveJournal(e) {
+      e.preventDefault();
+      const s1 = document.getElementById('syukur-1').value.trim();
+      const s2 = document.getElementById('syukur-2').value.trim();
+      const s3 = document.getElementById('syukur-3').value.trim();
+
+      const items = [s1, s2, s3].filter(Boolean);
+      if (items.length === 0) return;
+
+      const existingIdx = state.journals.findIndex(j => j.date === state.selectedDate);
+      const entry = {
+        id: existingIdx >= 0 ? state.journals[existingIdx].id : 'jurnal-' + Date.now(),
+        date: state.selectedDate,
+        mood: state.selectedMood,
+        items
+      };
+
+      if (existingIdx >= 0) {
+        state.journals[existingIdx] = entry;
+      } else {
+        state.journals.unshift(entry);
+      }
+
+      // Urutkan terbaru di atas
+      state.journals.sort((a, b) => b.date.localeCompare(a.date));
+      saveAllToStorage();
+      renderApp();
+      showToast('Jurnal syukur tersimpan. Alhamdulillah!', '🌿');
+    }
+
+    function deleteJournal(id) {
+      state.journals = state.journals.filter(j => j.id !== id);
+      saveAllToStorage();
+      renderApp();
+      showToast('Jurnal dihapus', '🗑️');
+    }
+
+    // Statistik Perkembangan
+    function setStatsMode(mode) {
+      state.statsMode = mode;
+      state.selectedBarDate = null;
+      renderApp();
+    }
+
+    function shiftStatsPeriod(delta) {
+      if (state.statsMode === 'bulanan') {
+        state.statsMonthOffset += delta;
+      } else {
+        state.statsWeekOffset += delta;
+      }
+      state.selectedBarDate = null;
+      renderApp();
+    }
+
+    function selectChartBar(dateStr) {
+      state.selectedBarDate = dateStr;
+      renderApp();
+    }
+
+    // Settings Modal
+    function openSettingsModal() {
+      const activeDays = Object.keys(state.dailyLogs).filter(k => (state.dailyLogs[k] || []).length > 0).length;
+      document.getElementById('stat-total-days').textContent = `${activeDays} hari`;
+      document.getElementById('stat-total-hajats').textContent = `${state.hajats.length} doa`;
+      document.getElementById('stat-total-journals').textContent = `${state.journals.length} jurnal`;
+
+      const modal = document.getElementById('modal-settings');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('modal-settings');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function resetToFreshEmpty() {
+      state.amalanList = [...DEFAULT_AMALAN];
+      state.dailyLogs = {};
+      state.hajats = [];
+      state.journals = [];
+      saveAllToStorage();
+      localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
+      closeSettingsModal();
+      renderApp();
+      showToast('Riwayat dikosongkan. Bismillah mulai hari ini!', '🌱');
+    }
+
+    function resetToDemoData() {
+      seedInitialData();
+      closeSettingsModal();
+      renderApp();
+      showToast('Data simulasi 20 hari dimuat ulang!', '✨');
+    }
+
+    // Toast Helper
+    let toastTimer = null;
+    function showToast(message, icon = '✨') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = message;
+      document.getElementById('toast-icon').textContent = icon;
+
+      toast.classList.remove('opacity-0', '-translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-2');
+      }, 2400);
+    }
+
+    // =========================================================================
+    // 11. STARTUP
+    // =========================================================================
+    // 11. PROGRESSIVE WEB APP (PWA) — IKON DINAMIS, MANIFEST & INSTALLER
+    // =========================================================================
+    let deferredInstallPrompt = null;
+
+    function generateAppIconDataUrl(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Background rounded gradient ungu malam
+      const grad = ctx.createLinearGradient(0, 0, size, size);
+      grad.addColorStop(0, '#7358FA');
+      grad.addColorStop(0.55, '#31256B');
+      grad.addColorStop(1, '#130F26');
+
+      const radius = size * 0.22;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.quadraticCurveTo(size, 0, size, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.quadraticCurveTo(size, size, size - radius, size);
+      ctx.lineTo(radius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Gambar Bulan Sabit Emas/Putih
+      ctx.save();
+      ctx.fillStyle = '#FDE68A';
+      ctx.beginPath();
+      ctx.arc(size * 0.48, size * 0.52, size * 0.25, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#3B2D7A';
+      ctx.beginPath();
+      ctx.arc(size * 0.57, size * 0.45, size * 0.21, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bintang kecil
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(size * 0.67, size * 0.34, size * 0.038, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      return canvas.toDataURL('image/png');
+    }
+
+    function setupPWA() {
+      try {
+        const icon192 = generateAppIconDataUrl(192);
+        const icon512 = generateAppIconDataUrl(512);
+
+        const appleIcon = document.getElementById('apple-touch-icon');
+        const favIcon = document.getElementById('app-favicon');
+        if (appleIcon) appleIcon.href = icon192;
+        if (favIcon) favIcon.href = icon192;
+
+        // Buat Web App Manifest dinamis
+        const manifestObj = {
+          name: 'Jalur Langit Tracker',
+          short_name: 'Jalur Langit',
+          description: 'Pelacak ibadah harian, sholat sunnah, doa & hajat, dan jurnal syukur.',
+          start_url: window.location.href,
+          display: 'standalone',
+          orientation: 'portrait',
+          background_color: '#0D0A1B',
+          theme_color: '#0D0A1B',
+          icons: [
+            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+            { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.getElementById('pwa-manifest');
+        if (manifestLink) manifestLink.href = manifestUrl;
+
+        // Daftarkan Service Worker inline untuk dukungan offline & syarat install PWA Chrome
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+          const swCode = `
+            const CACHE_NAME = 'jalur-langit-v1';
+            self.addEventListener('install', (e) => {
+              self.skipWaiting();
+            });
+            self.addEventListener('activate', (e) => {
+              e.waitUntil(clients.claim());
+            });
+            self.addEventListener('fetch', (e) => {
+              if (e.request.method !== 'GET') return;
+              e.respondWith(
+                fetch(e.request)
+                  .then((res) => {
+                    const resClone = res.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(e.request, resClone)).catch(() => {});
+                    return res;
+                  })
+                  .catch(() => caches.match(e.request))
+              );
+            });
+          `;
+          const swBlob = new Blob([swCode], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {});
+        }
+      } catch (err) {
+        console.warn('PWA setup fallback:', err);
+      }
+
+      // Cek apakah sudah berjalan dalam mode terinstall (standalone)
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      const dismissed = sessionStorage.getItem('jlt_install_dismissed');
+      if (!isStandalone && !dismissed) {
+        const banner = document.getElementById('install-banner');
+        if (banner) banner.classList.remove('hidden');
+      }
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const banner = document.getElementById('install-banner');
+      if (banner) banner.classList.remove('hidden');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      const banner = document.getElementById('install-banner');
+      if (banner) banner.classList.add('hidden');
+      showToast('Jalur Langit Tracker berhasil diinstall di HP!', '📲');
+    });
+
+    async function triggerInstallPWA() {
+      closeSettingsModal();
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+          deferredInstallPrompt = null;
+          dismissInstallBanner();
+        }
+      } else {
+        // Tampilkan panduan cara Add to Home Screen untuk iOS Safari atau browser lain
+        const guide = document.getElementById('modal-install-guide');
+        if (guide) {
+          guide.classList.remove('hidden');
+          guide.classList.add('flex');
+        }
+      }
+    }
+
+    function dismissInstallBanner() {
+      const banner = document.getElementById('install-banner');
+      if (banner) banner.classList.add('hidden');
+      sessionStorage.setItem('jlt_install_dismissed', 'true');
+    }
+
+    function closeInstallGuideModal() {
+      const guide = document.getElementById('modal-install-guide');
+      if (guide) {
+        guide.classList.add('hidden');
+        guide.classList.remove('flex');
+      }
+    }
+
+    // =========================================================================
+    // 12. STARTUP
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      setupPWA();
+      initData();
+      updateNavButtons();
+      renderApp();
+    });
+  </script>
+</body>
+</html>
