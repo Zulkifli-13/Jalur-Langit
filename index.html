@@ -208,23 +208,23 @@
     </nav>
 
   </div>
-
-  <!-- MODAL: Tambah Amalan Kustom -->
+  <!-- MODAL: Tambah / Edit Amalan -->
   <div id="modal-add-amalan" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-4">
     <div class="w-full max-w-[420px] bg-twilight-800 border border-lavender-500/25 rounded-3xl p-5 shadow-2xl view-animate">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-lavender-500/20 flex items-center justify-center text-lavender-400">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <div id="modal-amalan-icon-wrap" class="w-8 h-8 rounded-xl bg-lavender-500/20 flex items-center justify-center text-lavender-400">
+            <i id="modal-amalan-icon" data-lucide="plus-circle" class="w-4 h-4"></i>
           </div>
-          <h3 class="text-base font-bold text-white">Tambah Amalan Baru</h3>
+          <h3 id="modal-amalan-heading" class="text-base font-bold text-white">Tambah Amalan Baru</h3>
         </div>
         <button onclick="closeAddAmalanModal()" class="w-8 h-8 rounded-xl bg-twilight-700 text-slate-300 flex items-center justify-center hover:text-white">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <form onsubmit="handleAddAmalan(event)" class="space-y-3.5">
+      <form id="form-amalan" onsubmit="handleSaveAmalan(event)" class="space-y-3.5">
+        <input type="hidden" id="input-amalan-id" value="" />
         <div>
           <label class="block text-xs font-semibold text-lavender-300 mb-1">Nama Amalan</label>
           <input type="text" id="input-amalan-title" required placeholder="Contoh: Shalat Rawatib Ba'diyah Isya" class="w-full bg-twilight-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-lavender-500" />
@@ -259,7 +259,7 @@
 
         <div class="pt-2 flex gap-2.5">
           <button type="button" onclick="closeAddAmalanModal()" class="flex-1 py-2.5 rounded-xl bg-twilight-700 text-slate-300 text-xs font-bold hover:bg-twilight-600 transition">Batal</button>
-          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-xs font-bold shadow-lg shadow-lavender-500/30 transition">Simpan Amalan</button>
+          <button type="submit" id="btn-submit-amalan" class="flex-1 py-2.5 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-xs font-bold shadow-lg shadow-lavender-500/30 transition">Simpan Amalan</button>
         </div>
       </form>
     </div>
@@ -653,10 +653,10 @@
                     <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md border ${badgeColor}">${badgeLabel}</span>
                   </div>
                   <p class="text-[11.5px] text-slate-400 mt-0.5 truncate">${item.detail}</p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="event.stopPropagation(); openEditAmalanModal('${item.id}')" title="Edit amalan ini" class="w-7 h-7 rounded-lg bg-lavender-500/15 hover:bg-lavender-500/30 text-lavender-300 flex items-center justify-center transition">
+                  <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                </button>
                 <button onclick="event.stopPropagation(); deleteAmalanItem('${item.id}')" title="Hapus amalan ini" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 flex items-center justify-center transition">
                   <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
@@ -1235,6 +1235,30 @@
     }
 
     function openAddAmalanModal() {
+      document.getElementById('form-amalan').reset();
+      document.getElementById('input-amalan-id').value = '';
+      document.getElementById('modal-amalan-heading').textContent = 'Tambah Amalan Baru';
+      document.getElementById('btn-submit-amalan').textContent = 'Simpan Amalan';
+
+      const modal = document.getElementById('modal-add-amalan');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.getElementById('input-amalan-title').focus();
+    }
+
+    function openEditAmalanModal(amalanId) {
+      const target = state.amalanList.find(a => a.id === amalanId);
+      if (!target) return;
+
+      document.getElementById('input-amalan-id').value = target.id;
+      document.getElementById('input-amalan-title').value = target.title;
+      document.getElementById('input-amalan-detail').value = target.detail;
+      document.getElementById('input-amalan-type').value = target.type;
+      document.getElementById('input-amalan-category').value = target.category;
+
+      document.getElementById('modal-amalan-heading').textContent = 'Edit Amalan';
+      document.getElementById('btn-submit-amalan').textContent = 'Simpan Perubahan';
+
       const modal = document.getElementById('modal-add-amalan');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
@@ -1247,8 +1271,9 @@
       modal.classList.remove('flex');
     }
 
-    function handleAddAmalan(e) {
+    function handleSaveAmalan(e) {
       e.preventDefault();
+      const editId = document.getElementById('input-amalan-id').value.trim();
       const title = document.getElementById('input-amalan-title').value.trim();
       const detail = document.getElementById('input-amalan-detail').value.trim();
       const type = document.getElementById('input-amalan-type').value;
@@ -1256,97 +1281,41 @@
 
       if (!title) return;
 
-      const newAmalan = {
-        id: 'custom-' + Date.now(),
-        title,
-        detail: detail || '1x rutin',
-        category,
-        type,
-        icon: type === 'wajib' ? 'landmark' : type === 'sunnah' ? 'sparkles' : 'star'
-      };
+      const defaultIcon = type === 'wajib' ? 'landmark' : type === 'sunnah' ? 'sparkles' : 'star';
 
-      state.amalanList.push(newAmalan);
-      saveAllToStorage();
-      e.target.reset();
-      closeAddAmalanModal();
-      renderApp();
-      showToast('Amalan baru berhasil ditambahkan!', '🌙');
-    }
+      if (editId) {
+        const idx = state.amalanList.findIndex(a => a.id === editId);
+        if (idx >= 0) {
+          state.amalanList[idx] = {
+            ...state.amalanList[idx],
+            title,
+            detail: detail || '1x rutin',
+            category,
+            type,
+            icon: state.amalanList[idx].icon || defaultIcon
+          };
+        }
+        saveAllToStorage();
+        e.target.reset();
+        closeAddAmalanModal();
+        renderApp();
+        showToast('Perubahan amalan berhasil disimpan!', '✏️');
+      } else {
+        const newAmalan = {
+          id: 'custom-' + Date.now(),
+          title,
+          detail: detail || '1x rutin',
+          category,
+          type,
+          icon: defaultIcon
+        };
 
-    function deleteAmalanItem(id) {
-      state.amalanList = state.amalanList.filter(a => a.id !== id);
-      saveAllToStorage();
-      renderApp();
-      showToast('Amalan dihapus dari daftar', '🗑️');
-    }
-
-    function applyDefaultTemplateDirect() {
-      loadDefaultAmalanTemplate();
-      renderApp();
-      showToast('Paket amalan default dimuat. Kamu bebas hapus/edit!', '✨');
-    }
-
-    function deleteCustomAmalan(id) {
-      state.amalanList = state.amalanList.filter(a => a.id !== id);
-      saveAllToStorage();
-      renderApp();
-      showToast('Amalan kustom dihapus', '🗑️');
-    }
-
-    // Sub-tab Doa & Syukur
-    function switchDoaSubTab(sub) {
-      state.doaSubTab = sub;
-      renderApp();
-    }
-
-    function setHajatFilter(filter) {
-      state.hajatFilter = filter;
-      renderApp();
-    }
-
-    function handleAddHajat(e) {
-      e.preventDefault();
-      const title = document.getElementById('hajat-title').value.trim();
-      const category = document.getElementById('hajat-category').value;
-      const detail = document.getElementById('hajat-detail').value.trim();
-
-      if (!title) return;
-
-      state.hajats.unshift({
-        id: 'hajat-' + Date.now(),
-        title,
-        detail,
-        category,
-        prayerCount: 1,
-        answered: false,
-        createdAt: TODAY_STR,
-        answeredAt: null
-      });
-
-      saveAllToStorage();
-      e.target.reset();
-      renderApp();
-      showToast('Hajat tersimpan. Semoga Allah ijabah!', '🤲');
-    }
-
-    function incrementPrayer(hajatId) {
-      const target = state.hajats.find(h => h.id === hajatId);
-      if (!target) return;
-      target.prayerCount += 1;
-      saveAllToStorage();
-      renderApp();
-      showToast("Aamiin Ya Rabbal 'Alamin...", '✨');
-    }
-
-    function toggleHajatAnswered(hajatId) {
-      const target = state.hajats.find(h => h.id === hajatId);
-      if (!target) return;
-      target.answered = !target.answered;
-      target.answeredAt = target.answered ? TODAY_STR : null;
-      saveAllToStorage();
-      renderApp();
-      if (target.answered) {
-        showToast('MasyaAllah, Alhamdulillah terkabul!', '🎉');
+        state.amalanList.push(newAmalan);
+        saveAllToStorage();
+        e.target.reset();
+        closeAddAmalanModal();
+        renderApp();
+        showToast('Amalan baru berhasil ditambahkan!', '🌙');
       }
     }
 
