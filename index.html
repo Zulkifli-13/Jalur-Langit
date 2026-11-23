@@ -302,13 +302,13 @@
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           Install Aplikasi ke Layar Utama HP
         </button>
-        <button onclick="resetToFreshEmpty()" class="w-full py-2.5 px-4 rounded-xl bg-twilight-700 hover:bg-twilight-600 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition">
-          <i data-lucide="eraser" class="w-3.5 h-3.5 text-amber-400"></i>
-          Kosongkan Riwayat (Mulai dari 0)
+        <button onclick="resetToDefaultTemplate()" class="w-full py-2.5 px-4 rounded-xl bg-lavender-500/20 hover:bg-lavender-500/30 border border-lavender-500/30 text-lavender-300 text-xs font-bold flex items-center justify-center gap-2 transition">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          Default (Muat Paket Amalan Bawaan)
         </button>
-        <button onclick="resetToDemoData()" class="w-full py-2.5 px-4 rounded-xl bg-lavender-500/20 hover:bg-lavender-500/30 border border-lavender-500/30 text-lavender-300 text-xs font-bold flex items-center justify-center gap-2 transition">
-          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-          Muat Ulang Data Contoh (20 Hari)
+        <button onclick="resetToFreshEmpty()" class="w-full py-2.5 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-2 transition">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          Hapus Semua yg Saat Ini (Mulai dari 0)
         </button>
       </div>
     </div>
@@ -364,11 +364,11 @@
     // 1. KONFIGURASI & DATA DEFAULT JALUR LANGIT TRACKER
     // =========================================================================
     const STORAGE_KEYS = {
-      AMALAN_LIST: 'jlt_amalan_list_v2',
-      DAILY_LOGS: 'jlt_daily_logs_v2',
-      HAJATS: 'jlt_hajats_v2',
-      JOURNALS: 'jlt_journals_v2',
-      SEEDED: 'jlt_seeded_v2'
+      AMALAN_LIST: 'jlt_amalan_list_v3',
+      DAILY_LOGS: 'jlt_daily_logs_v3',
+      HAJATS: 'jlt_hajats_v3',
+      JOURNALS: 'jlt_journals_v3',
+      INITIALIZED: 'jlt_initialized_v3'
     };
 
     const CATEGORIES = [
@@ -382,92 +382,54 @@
 
     const DEFAULT_AMALAN = [
       // Sepertiga Malam
-      { id: 'tahajud', title: 'Shalat Tahajud', detail: '4 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'sparkles', custom: false },
-      { id: 'hajat', title: 'Shalat Hajat', detail: '2 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'heart', custom: false },
-      { id: 'taubat', title: 'Shalat Taubat', detail: '2 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'hand-heart', custom: false },
-      { id: 'witir', title: 'Shalat Witir', detail: '3 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'moon', custom: false },
+      { id: 'tahajud', title: 'Shalat Tahajud', detail: '4 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'sparkles' },
+      { id: 'hajat', title: 'Shalat Hajat', detail: '2 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'heart' },
+      { id: 'taubat', title: 'Shalat Taubat', detail: '2 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'hand-heart' },
+      { id: 'witir', title: 'Shalat Witir', detail: '3 rakaat', category: 'Sepertiga Malam', type: 'sunnah', icon: 'moon' },
 
       // Subuh & Pagi
-      { id: 'subuh', title: 'Shalat Subuh', detail: '2 rakaat • Wajib', category: 'Subuh & Pagi', type: 'wajib', icon: 'sunrise', custom: false },
-      { id: 'waqiah', title: "Surah Al-Waqi'ah", detail: '1x setelah Subuh', category: 'Subuh & Pagi', type: 'amalan', icon: 'book-open', custom: false },
-      { id: 'dhuha', title: 'Shalat Dhuha', detail: '4 rakaat', category: 'Subuh & Pagi', type: 'sunnah', icon: 'sun', custom: false },
-      { id: 'addhuha', title: 'Surah Ad-Dhuha', detail: '1x setelah Dhuha', category: 'Subuh & Pagi', type: 'amalan', icon: 'book-open', custom: false },
-      { id: 'sedekah_subuh', title: 'Sedekah Subuh', detail: '1x rutin pagi', category: 'Subuh & Pagi', type: 'amalan', icon: 'coins', custom: false },
-      { id: 'dzikir_pagi', title: 'Dzikir Pagi', detail: "Al-Ma'tsurat", category: 'Subuh & Pagi', type: 'amalan', icon: 'sparkles', custom: false },
+      { id: 'subuh', title: 'Shalat Subuh', detail: '2 rakaat • Wajib', category: 'Subuh & Pagi', type: 'wajib', icon: 'sunrise' },
+      { id: 'waqiah', title: "Surah Al-Waqi'ah", detail: '1x setelah Subuh', category: 'Subuh & Pagi', type: 'amalan', icon: 'book-open' },
+      { id: 'dhuha', title: 'Shalat Dhuha', detail: '4 rakaat', category: 'Subuh & Pagi', type: 'sunnah', icon: 'sun' },
+      { id: 'addhuha', title: 'Surah Ad-Dhuha', detail: '1x setelah Dhuha', category: 'Subuh & Pagi', type: 'amalan', icon: 'book-open' },
+      { id: 'sedekah_subuh', title: 'Sedekah Subuh', detail: '1x rutin pagi', category: 'Subuh & Pagi', type: 'amalan', icon: 'coins' },
+      { id: 'dzikir_pagi', title: 'Dzikir Pagi', detail: "Al-Ma'tsurat", category: 'Subuh & Pagi', type: 'amalan', icon: 'sparkles' },
 
       // Dzuhur
-      { id: 'dzuhur', title: 'Shalat Dzuhur', detail: '4 rakaat • Wajib', category: 'Dzuhur', type: 'wajib', icon: 'sun', custom: false },
-      { id: 'rawatib_dzuhur', title: "Shalat Qobliyah & Ba'diyah Dzuhur", detail: '4 + 2 rakaat', category: 'Dzuhur', type: 'sunnah', icon: 'sparkles', custom: false },
-      { id: 'arrahman', title: 'Surah Ar-Rahman', detail: '1x setelah Dzuhur', category: 'Dzuhur', type: 'amalan', icon: 'book-open', custom: false },
+      { id: 'dzuhur', title: 'Shalat Dzuhur', detail: '4 rakaat • Wajib', category: 'Dzuhur', type: 'wajib', icon: 'sun' },
+      { id: 'rawatib_dzuhur', title: "Shalat Qobliyah & Ba'diyah Dzuhur", detail: '4 + 2 rakaat', category: 'Dzuhur', type: 'sunnah', icon: 'sparkles' },
+      { id: 'arrahman', title: 'Surah Ar-Rahman', detail: '1x setelah Dzuhur', category: 'Dzuhur', type: 'amalan', icon: 'book-open' },
 
       // Ashar
-      { id: 'ashar', title: 'Shalat Ashar', detail: '4 rakaat • Wajib', category: 'Ashar', type: 'wajib', icon: 'cloud-sun', custom: false },
-      { id: 'assajadah', title: 'Surah As-Sajadah', detail: '1x setelah Ashar', category: 'Ashar', type: 'amalan', icon: 'book-open', custom: false },
-      { id: 'dzikir_petang', title: 'Dzikir Petang', detail: "Al-Ma'tsurat", category: 'Ashar', type: 'amalan', icon: 'sunset', custom: false },
+      { id: 'ashar', title: 'Shalat Ashar', detail: '4 rakaat • Wajib', category: 'Ashar', type: 'wajib', icon: 'cloud-sun' },
+      { id: 'assajadah', title: 'Surah As-Sajadah', detail: '1x setelah Ashar', category: 'Ashar', type: 'amalan', icon: 'book-open' },
+      { id: 'dzikir_petang', title: 'Dzikir Petang', detail: "Al-Ma'tsurat", category: 'Ashar', type: 'amalan', icon: 'sunset' },
 
       // Maghrib
-      { id: 'maghrib', title: 'Shalat Maghrib', detail: '3 rakaat • Wajib', category: 'Maghrib', type: 'wajib', icon: 'moon', custom: false },
-      { id: 'yasin', title: 'Surah Yasin', detail: '1x setelah Maghrib', category: 'Maghrib', type: 'amalan', icon: 'book-open', custom: false },
-      { id: 'tilawah', title: "Tilawah Al-Qur'an", detail: 'Minimal 2 lembar', category: 'Maghrib', type: 'amalan', icon: 'bookmark', custom: false },
+      { id: 'maghrib', title: 'Shalat Maghrib', detail: '3 rakaat • Wajib', category: 'Maghrib', type: 'wajib', icon: 'moon' },
+      { id: 'yasin', title: 'Surah Yasin', detail: '1x setelah Maghrib', category: 'Maghrib', type: 'amalan', icon: 'book-open' },
+      { id: 'tilawah', title: "Tilawah Al-Qur'an", detail: 'Minimal 2 lembar', category: 'Maghrib', type: 'amalan', icon: 'bookmark' },
 
       // Isya & Malam
-      { id: 'isya', title: 'Shalat Isya', detail: '4 rakaat • Wajib', category: 'Isya & Malam', type: 'wajib', icon: 'moon-star', custom: false },
-      { id: 'almulk', title: 'Surah Al-Mulk', detail: '1x sebelum tidur', category: 'Isya & Malam', type: 'amalan', icon: 'book-open', custom: false },
-      { id: 'sholawat', title: 'Sholawat Nabi', detail: 'Minimal 100x', category: 'Isya & Malam', type: 'amalan', icon: 'heart', custom: false },
-      { id: 'istighfar', title: 'Istighfar Harian', detail: 'Minimal 100x', category: 'Isya & Malam', type: 'amalan', icon: 'shield-check', custom: false },
+      { id: 'isya', title: 'Shalat Isya', detail: '4 rakaat • Wajib', category: 'Isya & Malam', type: 'wajib', icon: 'moon-star' },
+      { id: 'almulk', title: 'Surah Al-Mulk', detail: '1x sebelum tidur', category: 'Isya & Malam', type: 'amalan', icon: 'book-open' },
+      { id: 'sholawat', title: 'Sholawat Nabi', detail: 'Minimal 100x', category: 'Isya & Malam', type: 'amalan', icon: 'heart' },
+      { id: 'istighfar', title: 'Istighfar Harian', detail: 'Minimal 100x', category: 'Isya & Malam', type: 'amalan', icon: 'shield-check' },
     ];
 
     // =========================================================================
-    // 2. STATE APLIKASI
+    // 2. HELPER TANGGAL LOKAL (ANTI TIMEZONE SHIFT)
     // =========================================================================
-    const TODAY_STR = getLocalDateString(new Date());
-
-    let state = {
-      activeTab: 'hari-ini', // 'hari-ini' | 'doa-syukur' | 'perkembangan'
-      selectedDate: TODAY_STR,
-      doaSubTab: 'doa', // 'doa' | 'syukur'
-      hajatFilter: 'all', // 'all' | 'active' | 'answered'
-      selectedMood: 'Tenang 🕊️',
-      statsMode: 'bulanan', // 'mingguan' | 'bulanan'
-      statsMonthOffset: 0,
-      statsWeekOffset: 0,
-      selectedBarDate: null,
-      amalanList: [],
-      dailyLogs: {}, // { 'YYYY-MM-DD': ['subuh', 'tahajud', ...] }
-      hajats: [],
-      journals: []
-    };
-
-    // =========================================================================
-    // 3. HELPER TANGGAL & FORMAT INDONESIA
-    // =========================================================================
-    function getLocalDateString(dateObj) {
+    function getLocalDateString(dateObj = new Date()) {
       const y = dateObj.getFullYear();
       const m = String(dateObj.getMonth() + 1).padStart(2, '0');
       const d = String(dateObj.getDate()).padStart(2, '0');
       return `${y}-${m}-${d}`;
     }
 
-    function parseDateStr(str) {
-      const [y, m, d] = str.split('-').map(Number);
+    function parseDateStr(dateStr) {
+      const [y, m, d] = dateStr.split('-').map(Number);
       return new Date(y, m - 1, d);
-    }
-
-    function formatDisplayDate(str) {
-      const [y, m, d] = str.split('-');
-      return `${d}/${m}/${y}`;
-    }
-
-    function formatLongDateIndo(str) {
-      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-      const dt = parseDateStr(str);
-      return `${days[dt.getDay()]}, ${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
-    }
-
-    function formatMonthYearIndo(year, monthIdx) {
-      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      return `${months[monthIdx]} ${year}`;
     }
 
     function addDays(dateStr, delta) {
@@ -476,111 +438,71 @@
       return getLocalDateString(dt);
     }
 
+    function formatDisplayDate(dateStr) {
+      const [y, m, d] = dateStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    const BULAN_INDO = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const HARI_INDO = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+    function formatLongDateIndo(dateStr) {
+      const dt = parseDateStr(dateStr);
+      return `${HARI_INDO[dt.getDay()]}, ${dt.getDate()} ${BULAN_INDO[dt.getMonth()]} ${dt.getFullYear()}`;
+    }
+
+    function formatMonthYearIndo(year, monthIndex) {
+      return `${BULAN_INDO[monthIndex]} ${year}`;
+    }
+
     // =========================================================================
-    // 4. INISIALISASI STORAGE & DATA SIMULASI REALISTIS
+    // 3. STATE APLIKASI
+    // =========================================================================
+    const TODAY_STR = getLocalDateString(new Date());
+
+    let state = {
+      activeTab: 'hari-ini',
+      selectedDate: TODAY_STR,
+      amalanList: [],
+      dailyLogs: {},
+      hajats: [],
+      journals: [],
+      doaSubTab: 'doa',
+      hajatFilter: 'all',
+      selectedMood: 'Tenang 🕊️',
+      statsMode: 'bulanan',
+      statsMonthOffset: 0,
+      statsWeekOffset: 0,
+      selectedBarDate: null
+    };
+
+    // =========================================================================
+    // 4. INISIALISASI STORAGE (MULAI KOSONG BERSIH DARI 0)
     // =========================================================================
     function initData() {
-      const alreadySeeded = localStorage.getItem(STORAGE_KEYS.SEEDED);
-      if (!alreadySeeded) {
-        seedInitialData();
+      const alreadyInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
+      if (!alreadyInitialized) {
+        state.amalanList = [];
+        state.dailyLogs = {};
+        state.hajats = [];
+        state.journals = [];
+        saveAllToStorage();
+        localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
       } else {
         state.amalanList = JSON.parse(localStorage.getItem(STORAGE_KEYS.AMALAN_LIST) || '[]');
-        if (!state.amalanList.length) state.amalanList = [...DEFAULT_AMALAN];
         state.dailyLogs = JSON.parse(localStorage.getItem(STORAGE_KEYS.DAILY_LOGS) || '{}');
         state.hajats = JSON.parse(localStorage.getItem(STORAGE_KEYS.HAJATS) || '[]');
         state.journals = JSON.parse(localStorage.getItem(STORAGE_KEYS.JOURNALS) || '[]');
       }
     }
 
-    function seedInitialData() {
-      state.amalanList = [...DEFAULT_AMALAN];
-      const logs = {};
-      const allIds = state.amalanList.map(a => a.id);
-      const wajibIds = state.amalanList.filter(a => a.type === 'wajib').map(a => a.id);
-
-      // Seed 19 hari sebelumnya dengan variasi progres yang alami
-      for (let i = 19; i >= 1; i--) {
-        const dStr = addDays(TODAY_STR, -i);
-        // Mayoritas hari shalat wajib 5/5 lengkap, sebagian 4/5
-        const completed = new Set(i % 6 === 0 ? wajibIds.slice(0, 4) : wajibIds);
-        // Tambahkan amalan sunnah & surah secara konsisten (sekitar 65% - 92%)
-        const targetCount = 14 + ((i * 7) % 8);
-        for (let j = 0; j < allIds.length && completed.size < targetCount; j++) {
-          const idx = (i * 3 + j * 5) % allIds.length;
-          completed.add(allIds[idx]);
-        }
-        logs[dStr] = Array.from(completed);
-      }
-
-      // Hari ini: sudah tercentang sebagian agar user langsung melihat progres & bisa lanjut mencentang
-      logs[TODAY_STR] = [
-        'tahajud', 'hajat', 'taubat', 'witir',
-        'subuh', 'waqiah', 'dhuha', 'addhuha', 'sedekah_subuh', 'dzikir_pagi',
-        'dzuhur', 'arrahman', 'ashar', 'dzikir_petang', 'sholawat'
-      ];
-
-      state.dailyLogs = logs;
-
-      // Sample Catatan Doa & Hajat
-      state.hajats = [
-        {
-          id: 'hajat-1',
-          title: 'Rezeki berkah, halal & melimpah untuk keluarga',
-          detail: 'Ya Allah, lapangkanlah pintu rezeki kami dari arah yang tidak disangka-sangka, lunaskan segala amanah dan jadikan kami pribadi yang dermawan.',
-          category: 'Rezeki',
-          prayerCount: 24,
-          answered: false,
-          createdAt: addDays(TODAY_STR, -14),
-          answeredAt: null
-        },
-        {
-          id: 'hajat-2',
-          title: 'Orang tua selalu sehat, panjang umur & husnul khotimah',
-          detail: 'Rabbighfir lii wa liwaalidayya warhamhumaa kamaa rabbayaanii shaghiiraa. Sehatkan ayah dan ibu selalu.',
-          category: 'Keluarga',
-          prayerCount: 31,
-          answered: false,
-          createdAt: addDays(TODAY_STR, -18),
-          answeredAt: null
-        },
-        {
-          id: 'hajat-3',
-          title: 'Dimudahkan urusan pekerjaan & proyek baru bulan ini',
-          detail: 'Alhamdulillah setelah rutin tahajud, Al-Waqi\'ah dan sedekah subuh, Allah bukakan jalan yang jauh lebih baik dari ekspektasi.',
-          category: 'Karier',
-          prayerCount: 19,
-          answered: true,
-          createdAt: addDays(TODAY_STR, -21),
-          answeredAt: addDays(TODAY_STR, -3)
-        }
-      ];
-
-      // Sample Jurnal Syukur
-      state.journals = [
-        {
-          id: 'jurnal-1',
-          date: addDays(TODAY_STR, -1),
-          mood: 'Tenang 🕊️',
-          items: [
-            'Masih diberi bangun di sepertiga malam untuk Tahajud tanpa alarm',
-            'Rezeki makan siang yang nikmat dan tubuh yang sehat',
-            'Hati terasa lebih lapang menghadapi ujian pekerjaan'
-          ]
-        },
-        {
-          id: 'jurnal-2',
-          date: addDays(TODAY_STR, -3),
-          mood: 'Terharu 🥹',
-          items: [
-            'Satu hajat besar yang didoakan berbulan-bulan akhirnya terkabul',
-            'Keluarga di rumah dalam keadaan sehat wal afiat',
-            'Bisa konsisten membaca Al-Mulk sebelum tidur'
-          ]
-        }
-      ];
-
+    function loadDefaultAmalanTemplate() {
+      state.amalanList = DEFAULT_AMALAN.map(item => ({ ...item }));
       saveAllToStorage();
-      localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
+      localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
     }
 
     function saveAllToStorage() {
@@ -675,13 +597,35 @@
       const isToday = state.selectedDate === TODAY_STR;
 
       // Generate Dot Progress Bar (sesuai referensi visual screenshot)
-      const dotsHtml = state.amalanList.map((item, idx) => {
-        const isFilled = idx < totalDone;
-        return `<span class="h-2 flex-1 rounded-full transition-all duration-300 ${isFilled ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.65)]' : 'bg-white/20'}"></span>`;
-      }).join('');
+      const dotsHtml = totalAmalan === 0
+        ? `<span class="h-2 flex-1 rounded-full bg-white/15"></span>`
+        : state.amalanList.map((item, idx) => {
+            const isFilled = idx < totalDone;
+            return `<span class="h-2 flex-1 rounded-full transition-all duration-300 ${isFilled ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.65)]' : 'bg-white/20'}"></span>`;
+          }).join('');
 
-      // Render Daftar Amalan per Kategori Waktu
-      const categoriesHtml = CATEGORIES.map(cat => {
+      // Render Daftar Amalan per Kategori Waktu (atau Empty State jika masih 0)
+      const categoriesHtml = totalAmalan === 0 ? `
+        <div class="card-twilight rounded-3xl p-6 text-center space-y-3 border border-lavender-500/20">
+          <div class="w-12 h-12 rounded-2xl bg-lavender-500/15 text-lavender-300 flex items-center justify-center mx-auto">
+            <i data-lucide="moon-star" class="w-6 h-6"></i>
+          </div>
+          <div class="space-y-1">
+            <h3 class="text-sm font-extrabold text-white">Daftar Amalan Masih Kosong</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Susun sendiri target ibadah & shalat sunnah versimu, atau muat paket rekomendasi Jalur Langit.</p>
+          </div>
+          <div class="pt-1 flex flex-col sm:flex-row gap-2">
+            <button onclick="openAddAmalanModal()" class="flex-1 py-2.5 px-3 rounded-xl bg-lavender-500 hover:bg-lavender-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-lavender-500/25 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              Buat Amalan Sendiri
+            </button>
+            <button onclick="applyDefaultTemplateDirect()" class="flex-1 py-2.5 px-3 rounded-xl bg-twilight-700 hover:bg-twilight-600 text-lavender-200 text-xs font-bold flex items-center justify-center gap-1.5 border border-lavender-400/20 transition">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              Pakai Paket Default
+            </button>
+          </div>
+        </div>
+      ` : CATEGORIES.map(cat => {
         const itemsInCat = state.amalanList.filter(a => a.category === cat);
         if (itemsInCat.length === 0) return '';
 
@@ -713,11 +657,9 @@
               </div>
 
               <div class="flex items-center gap-2 shrink-0">
-                ${item.custom ? `
-                  <button onclick="event.stopPropagation(); deleteCustomAmalan('${item.id}')" title="Hapus amalan kustom" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 flex items-center justify-center transition">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                  </button>
-                ` : ''}
+                <button onclick="event.stopPropagation(); deleteAmalanItem('${item.id}')" title="Hapus amalan ini" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 flex items-center justify-center transition">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
                 <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all ${checked ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/35 animate-check' : 'border-2 border-white/20 bg-twilight-900/60 group-hover:border-lavender-400/60'}">
                   ${checked ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
                 </div>
@@ -812,7 +754,11 @@
 
             <div class="flex items-center justify-between text-[11.5px]">
               <span class="text-lavender-200/90 font-medium">
-                ${remaining === 0 ? 'MasyaAllah! Semua target amalan hari ini lengkap ✨' : `${remaining} amalan lagi menuju lengkap`}
+                ${totalAmalan === 0
+                  ? 'Tambahkan target amalanmu untuk mulai melacak'
+                  : remaining === 0
+                    ? 'MasyaAllah! Semua target amalan hari ini lengkap ✨'
+                    : `${remaining} amalan lagi menuju lengkap`}
               </span>
               <span class="font-bold text-amber-300">${totalAmalan > 0 ? Math.round((totalDone / totalAmalan) * 100) : 0}%</span>
             </div>
@@ -1316,8 +1262,7 @@
         detail: detail || '1x rutin',
         category,
         type,
-        icon: type === 'wajib' ? 'landmark' : type === 'sunnah' ? 'sparkles' : 'star',
-        custom: true
+        icon: type === 'wajib' ? 'landmark' : type === 'sunnah' ? 'sparkles' : 'star'
       };
 
       state.amalanList.push(newAmalan);
@@ -1326,6 +1271,19 @@
       closeAddAmalanModal();
       renderApp();
       showToast('Amalan baru berhasil ditambahkan!', '🌙');
+    }
+
+    function deleteAmalanItem(id) {
+      state.amalanList = state.amalanList.filter(a => a.id !== id);
+      saveAllToStorage();
+      renderApp();
+      showToast('Amalan dihapus dari daftar', '🗑️');
+    }
+
+    function applyDefaultTemplateDirect() {
+      loadDefaultAmalanTemplate();
+      renderApp();
+      showToast('Paket amalan default dimuat. Kamu bebas hapus/edit!', '✨');
     }
 
     function deleteCustomAmalan(id) {
@@ -1483,15 +1441,22 @@
     }
 
     function resetToFreshEmpty() {
-      state.amalanList = [...DEFAULT_AMALAN];
+      state.amalanList = [];
       state.dailyLogs = {};
       state.hajats = [];
       state.journals = [];
       saveAllToStorage();
-      localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
+      localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
       closeSettingsModal();
       renderApp();
-      showToast('Riwayat dikosongkan. Bismillah mulai hari ini!', '🌱');
+      showToast('Semua data & daftar amalan berhasil dihapus!', '🌱');
+    }
+
+    function resetToDefaultTemplate() {
+      loadDefaultAmalanTemplate();
+      closeSettingsModal();
+      renderApp();
+      showToast('Paket amalan default berhasil dimuat!', '✨');
     }
 
     function resetToDemoData() {
